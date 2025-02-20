@@ -1,20 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
-const TaskForm = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+const TaskForm = ({ UpdateTask }) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [category, setCategory] = useState("To-Do");
+  const [update, setUpdate] = useState(false)
 
-  const addTask = async (task) =>{
-    try {
-        const response = await axios.post("http://localhost:3000/tasks", task);
-
-        console.log("Task added successfully:", response.data);
-    } catch (error) {
-        console.error("Error adding task:", error.response?.data || error.message);
+  // Sync state when UpdateTask changes
+  useEffect(() => {
+    if (UpdateTask.edit) {
+      setTitle(UpdateTask.title || '');
+      setDescription(UpdateTask.description || '');
+      setCategory(UpdateTask.category || 'To-Do');
+      setUpdate(true)
     }
-  }
+  }, [UpdateTask]); 
+
+  const addTask = async (task) => {
+    try {
+      const response = await axios.post("http://localhost:3000/tasks", task);
+      console.log("Task added successfully:", response.data);
+    } catch (error) {
+      console.error("Error adding task:", error.response?.data || error.message);
+    }
+  };
+
+  const updateTask = async (task) => {
+    try {
+        console.log(UpdateTask._id)
+      const response = await axios.put(`http://localhost:3000/tasks/${UpdateTask._id}`, task);
+      console.log("Task Updated successfully:", response.data);
+    } catch (error) {
+      console.error("Error adding task:", error.response?.data || error.message);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) {
@@ -22,22 +43,26 @@ const TaskForm = () => {
       return;
     }
 
-    const newTask = {
-      title,
-      description,
-      category,
-    };
+    const newTask = { title, description, category };
 
-    addTask(newTask);
+    if(update){
+        updateTask({...newTask});
+        setUpdate(false)
+    }else {
+        addTask(newTask)
+    }
+
     setTitle("");
     setDescription("");
     setCategory("To-Do");
   };
-  
+
   return (
     <div className="container mx-auto p-6">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
-        <h2 className="text-2xl font-bold mb-4 text-center">Add Task</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          {update ? "Edit Task" : "Add Task"}
+        </h2>
         <div className="mb-4">
           <label className="block text-gray-700">Title</label>
           <input
@@ -74,7 +99,7 @@ const TaskForm = () => {
           type="submit"
           className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
         >
-          Add Task
+          {update ? "Update Task" : "Add Task"}
         </button>
       </form>
     </div>

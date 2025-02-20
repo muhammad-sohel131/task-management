@@ -3,9 +3,19 @@ import axios from "axios";
 import { io } from "socket.io-client";
 const socket = io("http://localhost:3000");
 
-const Tasks = () => {
+const Tasks = ({setEditingTask}) => {
     const [tasks, setTasks] = useState([]);
 
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`http://localhost:3000/tasks/${id}`);
+        } catch (error) {
+            console.error("Error deleting task:", error);
+        }
+    };
+    const handleEdit = (task) => {
+        setEditingTask(task);
+    };
     // Fetch tasks from API
     const fetchTasks = async () => {
         try {

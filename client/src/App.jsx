@@ -2,9 +2,14 @@ import { FcGoogle } from "react-icons/fc";
 import './App.css'
 import TaskForm from "./components/TaskForm/TaskForm";
 import Tasks from "./components/Tasks/Tasks";
+import { useState } from "react";
 
 function App() {
+  const [newTask, setNewTask] = useState({})
 
+  const setEditingTask = (task) => {
+    setNewTask({...task, edit:true})
+  }
   const user = true;
   if(!user) {
     return(
@@ -17,8 +22,8 @@ function App() {
   return (
     <div>
       <div>
-        <TaskForm />
-        <Tasks />
+        <TaskForm UpdateTask={{...newTask}} />
+        <Tasks setEditingTask={setEditingTask} />
       </div>
     </div>
   )

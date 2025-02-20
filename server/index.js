@@ -23,9 +23,28 @@ const taskSchema = new mongoose.Schema({
     category: { type: String, enum: ['To-Do', 'In Progress', 'Done'], required: true }
 });
 
+// model
 const Task = mongoose.model('Task', taskSchema);
 
+// Routes
+app.get('/tasks', async (req, res) => {
+    const tasks = await Task.find();
+    res.json(tasks);
+});
 
+app.post('/tasks', async (req, res) => {
+    try {
+        const task = new Task(req.body);
+        await task.save();
+        res.status(201).json(task);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+app.get('/', (req, res) => {
+    res.json({message: "Welcome to JobTask API End"})
+})
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

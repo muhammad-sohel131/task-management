@@ -42,6 +42,24 @@ app.post('/tasks', async (req, res) => {
     }
 });
 
+app.put('/tasks/:id', async (req, res) => {
+    try {
+        const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(task);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+app.delete('/tasks/:id', async (req, res) => {
+    try {
+        await Task.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Task deleted' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
 app.get('/', (req, res) => {
     res.json({message: "Welcome to JobTask API End"})
 })

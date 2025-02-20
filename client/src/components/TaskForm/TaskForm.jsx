@@ -1,12 +1,19 @@
 import { useState } from "react";
+import axios from "axios";
 
 const TaskForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("To-Do");
 
-  const addTask = (task) =>{
+  const addTask = async (task) =>{
+    try {
+        const response = await axios.post("http://localhost:3000/tasks", task);
 
+        console.log("Task added successfully:", response.data);
+    } catch (error) {
+        console.error("Error adding task:", error.response?.data || error.message);
+    }
   }
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,7 +28,7 @@ const TaskForm = () => {
       category,
     };
 
-    onAddTask(newTask);
+    addTask(newTask);
     setTitle("");
     setDescription("");
     setCategory("To-Do");

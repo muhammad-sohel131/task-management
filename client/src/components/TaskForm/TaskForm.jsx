@@ -17,8 +17,9 @@ const TaskForm = ({ UpdateTask, refetch }) => {
       setTitle(UpdateTask.title || '');
       setDescription(UpdateTask.description || '');
       setCategory(UpdateTask.category || 'To-Do');
+      console.log(UpdateTask)
+      console.log("use")
       setUpdate(true)
-      updateTask.edit = false
     }else{
       setUpdate(false)
     }

@@ -1,11 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { AuthContext } from "../../provider/AuthProvider";
 
 const TaskForm = ({ UpdateTask }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState("To-Do");
   const [update, setUpdate] = useState(false)
+
+  const {user} = useContext(AuthContext);
+  
 
   // Sync state when UpdateTask changes
   useEffect(() => {
@@ -28,7 +32,6 @@ const TaskForm = ({ UpdateTask }) => {
 
   const updateTask = async (task) => {
     try {
-        console.log(UpdateTask._id)
       const response = await axios.put(`http://localhost:3000/tasks/${UpdateTask._id}`, task);
       console.log("Task Updated successfully:", response.data);
     } catch (error) {
@@ -43,7 +46,7 @@ const TaskForm = ({ UpdateTask }) => {
       return;
     }
 
-    const newTask = { title, description, category };
+    const newTask = { title, description, category, authEmail: user.email };
 
     if(update){
         updateTask({...newTask});

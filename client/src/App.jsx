@@ -4,34 +4,57 @@ import TaskForm from "./components/TaskForm/TaskForm";
 import Tasks from "./components/Tasks/Tasks";
 import { useContext, useState } from "react";
 import { AuthContext } from "./provider/AuthProvider";
+import axios from "axios";
 
 function App() {
   const [newTask, setNewTask] = useState({})
-  const { user, googleSignIn, loading} = useContext(AuthContext)
+  const { user, googleSignIn, loading, logOut } = useContext(AuthContext)
 
   const setEditingTask = (task) => {
-    setNewTask({...task, edit:true})
+    setNewTask({ ...task, edit: true })
   }
 
-  const login = async() => {
-    const res = await googleSignIn();
-    console.log(res);
+  const login = async () => {
+    try {
+      const res = await googleSignIn();
+      const email = res.user.email
+      const displayName = res.user.displayName
+      const data = await axios.post("http://localhost:3000/users", { email, displayName })
+      console.log(data)
+    } catch (err) {
+      console.log(err)
+    }
+
   }
 
-  if(loading) return <h2>Loading....</h2>
+  if (loading) return <h2>Loading....</h2>
 
-  if(!user) {
-    return(
+  if (!user) {
+    return (
       <div className='loginPage'>
-            <h2>Login to Get Into!</h2>
-            <button onClick={login}> <FcGoogle /> Sign In With Google</button>
+        <h2>Login to Get Into!</h2>
+        <button onClick={login}> <FcGoogle /> Sign In With Google</button>
       </div>
     )
   }
   return (
     <div>
       <div>
-        <TaskForm UpdateTask={{...newTask}} />
+        <header className="bg-blue-500 text-white p-4 shadow-md">
+          <div className="container mx-auto flex justify-between items-center">
+            {/* Title */}
+            <h1 className="text-xl font-bold">My Dashboard</h1>
+
+            {/* Logout Button */}
+            <button
+              onClick={logOut}
+              className="bg-white text-blue-500 px-4 py-2 rounded-md shadow hover:bg-gray-100 transition"
+            >
+              Logout
+            </button>
+          </div>
+        </header>
+        <TaskForm UpdateTask={{ ...newTask }} />
         <Tasks setEditingTask={setEditingTask} />
       </div>
     </div>

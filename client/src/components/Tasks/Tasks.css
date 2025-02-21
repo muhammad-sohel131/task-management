@@ -1,0 +1,7 @@
+.task_card {
+    cursor: grab;
+}
+.task_card:active {
+    opacity: .7;
+    border: 1px solid #111;
+}

@@ -22,7 +22,7 @@ function App() {
 
   const fetchAgain = () => {
     refetch();
-    setEditingTask({})
+    setNewTask({})
     setTasks(data)
   }
 
@@ -46,7 +46,7 @@ function App() {
     }
 
   }
-  console.log(tasks)
+ 
   if (loading) return <h2>Loading....</h2>
 
   if (!user) {

@@ -62,7 +62,6 @@ const Tasks = ({ setEditingTask, tasksAll }) => {
       const handleEdit = (task) => {
         setEditingTask(task);
     };
-      console.log(tasks)
 
     return (
         <div className="container mx-auto p-6">

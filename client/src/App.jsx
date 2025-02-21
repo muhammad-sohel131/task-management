@@ -2,13 +2,33 @@ import { FcGoogle } from "react-icons/fc";
 import './App.css'
 import TaskForm from "./components/TaskForm/TaskForm";
 import Tasks from "./components/Tasks/Tasks";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./provider/AuthProvider";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 function App() {
   const [newTask, setNewTask] = useState({})
+  const [tasks, setTasks] = useState([])
   const { user, googleSignIn, loading, logOut } = useContext(AuthContext)
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const result = await axios.get(`https://server-xi-red-55.vercel.app/tasks/${user.email}`);;
+      return result.data
+    },
+  });
+
+  const fetchAgain = () => {
+    refetch();
+    setEditingTask({})
+    setTasks(data)
+  }
+
+  useEffect(() => {
+    setTasks(data)
+  },[data])
 
   const setEditingTask = (task) => {
     setNewTask({ ...task, edit: true })
@@ -26,14 +46,14 @@ function App() {
     }
 
   }
-
+  console.log(tasks)
   if (loading) return <h2>Loading....</h2>
 
   if (!user) {
     return (
       <div className='loginPage'>
         <h2>Login to Get Into!</h2>
-        <button onClick={login}> <FcGoogle /> Sign In With Google</button>
+       <button onClick={login}> <FcGoogle /> Sign In With Google</button>
       </div>
     )
   }
@@ -54,8 +74,8 @@ function App() {
             </button>
           </div>
         </header>
-        <TaskForm UpdateTask={{ ...newTask }} />
-        <Tasks setEditingTask={setEditingTask} />
+        <TaskForm UpdateTask={{ ...newTask }} refetch={fetchAgain}/>
+        <Tasks setEditingTask={setEditingTask} tasksAll={tasks}/>
       </div>
     </div>
   )

@@ -9,13 +9,6 @@ require('dotenv').config();
 const app = express();
 const PORT = 3000;
 
-// Create an HTTP server for Express and WebSockets
-const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-    },
-});
 
 // Middleware
 app.use(express.json());
@@ -30,7 +23,6 @@ const uri = `mongodb+srv://${userName}:${password}@cluster0.jd7el.mongodb.net/ta
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log("MongoDB connected successfully");
-        startChangeStream();
     })
     .catch(err => console.error("MongoDB connection error:", err));
 
@@ -55,25 +47,7 @@ const User = mongoose.model("User", new mongoose.Schema({
 }, { timestamps: true }));
 
 
-// Start Change Stream after DB connection
-function startChangeStream() {
-    const taskCollection = mongoose.connection.collection("tasks");
-    const changeStream = taskCollection.watch();
 
-    changeStream.on("change", (change) => {
-        console.log("Change detected:", change);
-        io.emit("task-updated", change);
-    });
-}
-
-// WebSocket Connection
-io.on("connection", (socket) => {
-    console.log("Client connected");
-
-    socket.on("disconnect", () => {
-        console.log("Client disconnected");
-    });
-});
 
 // Routes
 app.get('/users', async (req, res) => {
@@ -170,6 +144,6 @@ app.get('/', (req, res) => {
 });
 
 // Start the Server
-server.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

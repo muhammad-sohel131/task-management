@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../provider/AuthProvider";
 
-const TaskForm = ({ UpdateTask }) => {
+const TaskForm = ({ UpdateTask, refetch }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState("To-Do");
@@ -18,12 +18,15 @@ const TaskForm = ({ UpdateTask }) => {
       setDescription(UpdateTask.description || '');
       setCategory(UpdateTask.category || 'To-Do');
       setUpdate(true)
+      updateTask.edit = false
+    }else{
+      setUpdate(false)
     }
   }, [UpdateTask]); 
 
   const addTask = async (task) => {
     try {
-      const response = await axios.post("http://localhost:3000/tasks", task);
+      const response = await axios.post("https://server-xi-red-55.vercel.app/tasks", task);
       console.log("Task added successfully:", response.data);
     } catch (error) {
       console.error("Error adding task:", error.response?.data || error.message);
@@ -32,14 +35,14 @@ const TaskForm = ({ UpdateTask }) => {
 
   const updateTask = async (task) => {
     try {
-      const response = await axios.put(`http://localhost:3000/tasks/${UpdateTask._id}`, task);
+      const response = await axios.put(`https://server-xi-red-55.vercel.app/tasks/${UpdateTask._id}`, task);
       console.log("Task Updated successfully:", response.data);
     } catch (error) {
       console.error("Error adding task:", error.response?.data || error.message);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
       alert("Title is required");
@@ -49,15 +52,19 @@ const TaskForm = ({ UpdateTask }) => {
     const newTask = { title, description, category, authEmail: user.email };
 
     if(update){
-        updateTask({...newTask});
+        await updateTask({...newTask});
         setUpdate(false)
     }else {
-        addTask(newTask)
+        await addTask(newTask)
     }
-
     setTitle("");
     setDescription("");
     setCategory("To-Do");
+
+    refetch()
+    setUpdate(false)
+    console.log(UpdateTask)
+    console.log(update)
   };
 
   return (
@@ -109,4 +116,4 @@ const TaskForm = ({ UpdateTask }) => {
   );
 };
 
-export default TaskForm;
+export default TaskForm; 
